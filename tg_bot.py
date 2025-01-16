@@ -4,7 +4,7 @@ from environs import Env
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
-from test import detect_intent_texts
+from dialogflow import detect_intent_texts
 
 
 logging.basicConfig(
