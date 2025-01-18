@@ -4,11 +4,20 @@ import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from environs import Env
 
+from dialogflow import detect_intent_texts
+
 
 def echo(event, vk_api):
+    env = Env()
+    env.read_env()
+
+    project_id = env.str('PROJECT_ID')
+    text = event.text
+    session_id = user_id=event.user_id,
+    response_text = detect_intent_texts(project_id, session_id, text)
     vk_api.messages.send(
         user_id=event.user_id,
-        message=event.text,
+        message=response_text,
         random_id=random.randint(1,1000)
     )
 
