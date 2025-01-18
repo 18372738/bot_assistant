@@ -90,3 +90,4 @@ db.sqlite3
 media/
 .gitattributes
 .Identifier
+training_phrases.json
