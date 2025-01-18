@@ -33,8 +33,8 @@ def response(update: Update, context: CallbackContext) -> None:
     project_id = env.str('PROJECT_ID')
     text = update.message.text
     session_id = update.message.chat_id
-    response_text = detect_intent_texts(project_id, session_id, text)
-    update.message.reply_text(response_text)
+    fulfillment_text, is_fallback = detect_intent_texts(project_id, session_id, text)
+    update.message.reply_text(fulfillment_text)
 
 
 def main() -> None:
