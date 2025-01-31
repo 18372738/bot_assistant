@@ -1,29 +1,33 @@
 import logging
 
 from environs import Env
-from telegram import Update, ForceReply
+from time import sleep
+from telegram import Update, ForceReply, Bot
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
 from dialogflow import detect_intent_texts
 
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
+class TelegramLogsHandler(logging.Handler):
 
-logger = logging.getLogger(__name__)
+    def __init__(self, bot, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.bot = bot
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
 def start(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /start is issued."""
     user = update.effective_user
-    update.message.reply_markdown_v2(
-        'Здравствуйте\!',
+    update.message.reply_text(
+        'Я бот-помощник.Задавайте любые вопросы'
     )
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
@@ -31,24 +35,42 @@ def response(update: Update, context: CallbackContext) -> None:
     env = Env()
     env.read_env()
     project_id = env.str('PROJECT_ID')
-    text = update.message.text
-    session_id = update.message.chat_id
-    fulfillment_text, is_fallback = detect_intent_texts(project_id, session_id, text)
-    update.message.reply_text(fulfillment_text)
+    try:
+        text = update.message.text
+        session_id = update.message.chat_id
+        fulfillment_text, is_fallback = detect_intent_texts(project_id, session_id, text)
+        update.message.reply_text(fulfillment_text)
+    except requests.ReadTimeout:
+        return
+    except requests.ConnectionError:
+        logger.warning("Нет интернет соединения.")
+        time.sleep(10)
+    except Exception as error:
+        logger.error(f'Бот упал с ошибкой:\n{error}')
+        raise
 
 
 def main() -> None:
-    """Start the bot."""
     env = Env()
     env.read_env()
 
+    logging.basicConfig(format="%(process)d %(levelname)s %(message)s")
+    logger = logging.getLogger('telegram_logger')
+    logger.setLevel(logging.INFO)
+
     telegram_token = env.str('TELEGRAM_TOKEN')
-    updater = Updater(telegram_token)
+    telegram_logger = env.str('TELEGRAM_LOGGER')
+    chat_id = env.str('CHAT_ID')
+    bot = Bot(token=telegram_logger)
+
+    updater = Updater(telegram_token, use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, response))
 
+    logger.addHandler(TelegramLogsHandler(bot, chat_id))
+    logger.info("Телеграм бот запущен.")
     updater.start_polling()
     updater.idle()
 
