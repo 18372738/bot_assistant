@@ -3,9 +3,9 @@
 Данный бот предназначен для ответов на не сложные вопросы, а вопросы посложнее перенаправляет на специалиста. Бот обучается с помощью нейросети.
 ## Пример бота
 ### [Telegram бот](https://t.me/ForspeechBot)
-![Анимация](https://gist.github.com/user-attachments/assets/f81eb7a0-5011-4d95-9fa3-14a007e4fffe)
+![Анимация](https://github.com/user-attachments/assets/7c260424-e9c2-4c9a-bce6-7115ca2f9269)
 ### [Сообщество Вконтакте](https://vk.com/club229054478)
-![Анимация](https://gist.github.com/user-attachments/assets/fa502029-53a7-457a-bcfd-4bee3a682625)
+![Анимация](https://github.com/user-attachments/assets/4cd3ef63-b070-4bc3-93fc-32a6a472fe5b)
 ## Что понадобится?
 ### Предварительные требования
 Скачайте или склонируйте репозиторий на свой компьютер.
