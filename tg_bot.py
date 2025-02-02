@@ -31,10 +31,10 @@ def help_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Help!')
 
 
-def response(update: Update, context: CallbackContext) -> None:
-    env = Env()
-    env.read_env()
-    project_id = env.str('PROJECT_ID')
+def handle_tg_message(update: Update, context: CallbackContext) -> None:
+    env = context.bot_data["env"]
+    project_id = env.str("PROJECT_ID")
+    logger = context.bot_data["logger"]
     try:
         text = update.message.text
         session_id = update.message.chat_id
@@ -61,13 +61,16 @@ def main() -> None:
     telegram_token = env.str('TELEGRAM_TOKEN')
     telegram_logger = env.str('TELEGRAM_LOGGER')
     chat_id = env.str('CHAT_ID')
+    project_id = env.str('PROJECT_ID')
     bot = Bot(token=telegram_logger)
 
     updater = Updater(telegram_token, use_context=True)
     dispatcher = updater.dispatcher
+    dispatcher.bot_data["env"] = env
+    dispatcher.bot_data["logger"] = logger
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, response))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_tg_message))
 
     logger.addHandler(TelegramLogsHandler(bot, chat_id))
     logger.info("Телеграм бот запущен.")
