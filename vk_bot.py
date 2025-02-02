@@ -13,7 +13,8 @@ from error_logging import TelegramLogsHandler
 
 def handle_vk_message(event, vk_client, project_id):
     text = event.text
-    session_id = f"vk{user_id=event.user_id}",
+    user_id = user_id=event.user_id,
+    session_id = f"vk{user_id}"
     fulfillment_text, is_fallback = detect_intent_texts(project_id, session_id, text)
     if is_fallback:
         return
@@ -21,7 +22,7 @@ def handle_vk_message(event, vk_client, project_id):
     vk_client.messages.send(
         user_id=event.user_id,
         message=fulfillment_text,
-        random_id=random.randint(1,1000000)
+        random_id=random.randint(1,10000)
     )
 
 
