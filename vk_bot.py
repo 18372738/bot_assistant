@@ -13,7 +13,7 @@ from error_logging import TelegramLogsHandler
 
 def handle_vk_message(event, vk_client, project_id):
     text = event.text
-    session_id = user_id=event.user_id,
+    session_id = f"vk{user_id=event.user_id}",
     fulfillment_text, is_fallback = detect_intent_texts(project_id, session_id, text)
     if is_fallback:
         return

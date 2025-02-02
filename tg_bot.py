@@ -26,7 +26,7 @@ def handle_tg_message(update: Update, context: CallbackContext) -> None:
     logger = context.bot_data["logger"]
     try:
         text = update.message.text
-        session_id = update.message.chat_id
+        session_id = f"tg{update.message.chat_id}"
         fulfillment_text, is_fallback = detect_intent_texts(project_id, session_id, text)
         update.message.reply_text(fulfillment_text)
     except requests.ReadTimeout:
