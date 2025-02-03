@@ -1,4 +1,5 @@
 import logging
+from functools import partial
 
 from environs import Env
 from time import sleep
@@ -16,14 +17,11 @@ def start(update: Update, context: CallbackContext) -> None:
     )
 
 
-def help_command(update: Update, context: CallbackContext) -> None:
+def show_help(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Help!')
 
 
-def handle_tg_message(update: Update, context: CallbackContext) -> None:
-    env = context.bot_data["env"]
-    project_id = env.str("PROJECT_ID")
-    logger = context.bot_data["logger"]
+def handle_tg_message(project_id: str, update: Update, context: CallbackContext) -> None:
     try:
         text = update.message.text
         session_id = f"tg{update.message.chat_id}"
@@ -58,8 +56,8 @@ def main() -> None:
     dispatcher.bot_data["env"] = env
     dispatcher.bot_data["logger"] = logger
     dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("help", help_command))
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_tg_message))
+    dispatcher.add_handler(CommandHandler("help", show_help))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, partial(handle_tg_message, project_id)))
 
     logger.addHandler(TelegramLogsHandler(bot, chat_id))
     logger.info("Телеграм бот запущен.")
